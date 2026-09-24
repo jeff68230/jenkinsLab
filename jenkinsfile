@@ -1,27 +1,28 @@
 pipeline {
     agent any
     stages {
-        stage('Compilation & Tests') {
-            parallel {
-                stage('Build') {
-                    steps {
+        stage('Build') {
+            steps {
+                script {
+                    try {
                         echo "Compilation en cours..."
-                        bat 'sleep 3' // Simulation du build
-                    }
-                }
-                stage('Tests Unitaires') {
-                    steps {
-                        echo "Exécution des tests unitaires..."
-                        bat 'sleep 2' // Simulation des tests unitaires
-                    }
-                }
-                stage('Analyse Qualité') {
-                    steps {
-                        echo "Analyse statique du code avec SonarQube..."
-                        bat 'sleep 4' // Simulation de l’analyse
+                        bat 'exit 1' // Simulation d'une erreur
+                    } catch (Exception e) {
+                        echo "Erreur détectée dans le build !"
+                        currentBuild.result = 'FAILURE'
                     }
                 }
             }
+        }
+    }
+    post {
+        failure {
+            echo "Le pipeline a échoué, envoi d’une notification..."
+            bat 'echo "Erreur détectée" > erreur.log'
+            archiveArtifacts artifacts: 'erreur.log', fingerprint: true
+        }
+        success {
+            echo "Pipeline exécuté avec succès !"
         }
     }
 }
