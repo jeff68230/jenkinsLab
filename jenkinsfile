@@ -1,29 +1,54 @@
 pipeline {
     agent any
+
     environment {
-        APP_NAME = 'my-app'
+        APP_NAME = "MonApplication"
+        BUILD_ENV = "DEV"
+        GIT_CREDS = credentials('git_user')
     }
+
+    parameters {
+        string(name: 'VERSION', defaultValue: '1.0.0', description: 'Version du build')
+        choice(name: 'DEPLOY_ENV', choices: ['DEV', 'TEST', 'PROD'], description: 'Environnement cible')
+    }
+
     stages {
+        stage('Init') {
+            steps {
+                echo "=== Initialisation ==="
+                echo "Application : ${APP_NAME}"
+                echo "Version : ${params.VERSION}"
+                echo "Environnement : ${params.DEPLOY_ENV}"
+                echo "Utilisateur Git : ${GIT_CREDS_USR}"
+            }
+        }
+
         stage('Build') {
             steps {
-                script {
-                    def buildVersion = "1.0.${env.BUILD_NUMBER}"
-                    echo "Building ${APP_NAME} version ${buildVersion}"
-                }
+                sh '''
+                    echo "=== Compilation ==="
+                    mkdir -p build
+                    echo "Fichier de build pour $APP_NAME ($VERSION)" > build/info.txt
+                '''
             }
         }
-        stage('Test') {
+
+        stage('Tests') {
             steps {
-                echo "Testing ${APP_NAME}..."
+                sh 'echo "Tests OK" > build/tests.txt'
             }
         }
-        stage('Deploy') {
+
+        stage('Archive') {
             steps {
-                script {
-                    def buildVersion = "1.0.${env.BUILD_NUMBER}"
-                    echo "Deploying ${APP_NAME} version ${buildVersion}"
-                }
+                archiveArtifacts artifacts: 'build/*.txt', fingerprint: true
             }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline terminé."
         }
     }
 }
