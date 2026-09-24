@@ -19,7 +19,7 @@ pipeline {
                 echo "Application : ${APP_NAME}"
                 echo "Version : ${params.VERSION}"
                 echo "Environnement : ${params.DEPLOY_ENV}"
-                echo "Utilisateur Git : ${GIT_CREDS_USR}"
+               // echo "Utilisateur Git : ${GIT_CREDS_USR}"
             }
         }
 
