@@ -4,7 +4,7 @@ pipeline {
     environment {
         APP_NAME = "MonApplication"
         BUILD_ENV = "DEV"
-        GIT_CREDS = credentials('git_user')
+      //  GIT_CREDS = credentials('git_user')
     }
 
     parameters {
